@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.UserDao">
+<!-- 分页-->
+    <select id="selectAll" resultType="User">
+        select user_id id,phone,password,salt,dharmaName,province,city,gender,personal_sign personalSign,profile,status,regist_time registTime from c_user
+        limit #{begin},#{rows}
+    </select>
+    <select id="selectRecords" resultType="Integer">
+         select count(*) from c_user
+    </select>
+<!-- 柱状图（自己的，月份写死的，只显示有注册人数的月份）-->
+    <select id="selectMonth" resultType="Integer">
+        select count(*) count, left(regist_time,7) month from c_user GROUP BY left(regist_time,7)
+    </select>
+
+    <update id="updateImgPath">
+        update c_user set imgPath = #{imgPath} where carousel_id = #{id}
+    </update>
+<!--用户注册-->
+    <insert id="regist" parameterType="User">
+        insert into c_user values (#{id},#{phone},#{password},#{salt},#{dharmaName},#{province},#{city},#{gender},#{personalSign},#{profile},#{status},#{registTime})
+    </insert>
+<!--根据电话查询用户是否已经注册-->
+    <select id="selectByPhone" resultType="User">
+        select user_id id,phone,password,salt,dharmaName,province,city,gender,personal_sign personalSign,profile,status,regist_time registTime from c_user where phone = #{phone}
+    </select>
+<!--修改用户状态-->
+    <update id="updateStatus" >
+        update c_user set status =#{status} where user_id = #{id}
+    </update>
+<!--修改用户信息-->
+    <update id="updateUser">
+        update c_user set user_id=#{id},phone=#{phone},password=#{password},salt=#{salt},dharmaName=#{dharmaName},province=#{province},city=#{city},gender=#{gender},personal_sign=#{personalSign},profile=#{profile},status=#{status},regist_time=#{registTime} where user_id=#{id}
+    </update>
+
+
+
+<!-- 柱状图和地图-->
+<!-- 柱状图-->
+    <select id="selectMonthAndCount" resultType="MonthAndCount">
+        select count(*) count, left(regist_time,7) month from c_user GROUP BY left(regist_time,7)
+    </select>
+<!-- 按省份查每个省的男女人数-->
+    <select id="selectByGender" resultType="Gender">
+        select count(*) value,province name from c_user where gender = #{gender} group by province
+    </select>
+</mapper>
